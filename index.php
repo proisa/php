@@ -195,15 +195,96 @@ try
   $conn->query("SET NAMES latin1");
   $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );   
   
-  $codigo = '02';
-  // 
-  $query = $conn->prepare("SELECT MO_DESCRI FROM PVBDMODELO");
-  $query->execute();
-  $res = $query->fetchAll(PDO::FETCH_ASSOC);
   
-    $queryUpdate = $conn->prepare("UPDATE PVBDMODELO SET MO_DESCRI = ''");
-    $queryUpdate->execute();
-  print_pre($res);
+//   // Ejemplo de insert con marcadores anonimos
+//   $insert = $conn->prepare("INSERT INTO CCBDVEND (ve_codigo,ve_nombre,ve_comven,ve_comcob,ve_direc) VALUES (?,?,?,?,?)");
+
+//   $codigo = 'CDP12';
+//   $nombre = 'Dionicio';
+//   $comision_venta = 10;
+//   $comision_cobro = 5;
+//   $direccion = 'Santiago';
+
+//   $insert->bindParam(1,$codigo);
+//   $insert->bindParam(2,$nombre);
+//   $insert->bindParam(3,$comision_venta);
+//   $insert->bindParam(4,$comision_cobro);
+//   $insert->bindParam(5,$direccion);
+
+//   $insert->execute();
+
+// Ejemplo de insert con marcadores conicidos
+$insert = $conn->prepare("INSERT INTO CCBDVEND (ve_codigo,ve_nombre,ve_comven,ve_comcob,ve_direc) VALUES (:codigo,:nombre,:comv,:comc,:direccion)");
+
+$codigo = 'CDP14';
+$nombre = 'Fransisco';
+$comision_venta = 10;
+$comision_cobro = 5;
+$direccion = 'Santiago';
+
+$insert->bindParam(':codigo',$codigo);
+$insert->bindParam(':nombre',$nombre);
+$insert->bindParam(':comv',$comision_venta);
+$insert->bindParam(':comc',$comision_cobro);
+$insert->bindParam(':direccion',$direccion);
+
+//$insert->execute();
+
+// if($insert->rowCount() > 0){
+//     echo "El codigo {$codigo} se inserto correctamente";
+// }else{
+//     echo 'Error al insertar';
+// }
+
+// Ejemplo de Update
+
+$update = $conn->prepare("UPDATE CCBDVEND SET ve_nombre = :nombre WHERE ve_codigo = :codigo");
+
+$nombre_up = 'Juan';
+$codigo_up = 'CDP14';
+
+$update->bindParam(':nombre',$nombre_up);
+$update->bindParam(':codigo',$codigo_up);
+
+//$update->execute();
+
+// if($update->rowCount() > 0){
+//     echo "El codigo {$codigo_up} se actualizo correctamente";
+// }else{
+//     echo 'Error al actualizar';
+// }
+
+// Ejemplo de Delete
+$delete = $conn->prepare("DELETE TOP (1) FROM CCBDVEND WHERE ve_codigo = :codigo AND ve_id = :id");
+
+$codigo_del = '1018';
+$id_del = 34;
+
+$delete->bindParam(':codigo',$codigo_del);
+$delete->bindParam(':id',$id_del,PDO::PARAM_INT);
+//$delete->execute();
+
+// if($delete->rowCount() > 0){
+//     echo "El codigo {$codigo_del} se elimino correctamente";
+// }else{
+//     echo 'Error al eliminar';
+// }
+
+//CCBDCLIE
+
+  $query = $conn->query("SELECT TOP 10 CL_CODIGO,CL_NOMBRE,CL_DIREC1,CL_TELEF1,ZO_CODIGO,CL_LIMCRE FROM CCBDCLIE");
+  $res = $query->fetchAll(PDO::FETCH_ASSOC);
+
+  //print_pre($res);
+
+  foreach ($res as $key => $value) {
+      echo $value['CL_CODIGO'].' ';
+      echo  substr($value['CL_NOMBRE'],0,10).' ';
+      echo $value['ZO_CODIGO'].' ';
+      echo number_format($value['CL_LIMCRE'],2);
+      echo '<br>';
+  }
+
 }catch(PDOException $e){
   echo $e->getMessage();
   die();
